@@ -24,10 +24,16 @@ export default function App() {
   //funções
   async function handleLikeRepository(id) {
     const response = await api.post(`repositories/${id}/like`);
-
-    const repository = response.data;
-
-    setRepositories([...repositories, repository]);
+    if (response.status === 200) {
+      const newRepositories = [...repositories];
+      const index = newRepositories.findIndex(
+        (repository) => repository.id === id
+      );
+      if (index >= 0) {
+        newRepositories[index] = response.data;
+        setRepositories(newRepositories);
+      }
+    }
   }
 
   return (
@@ -44,7 +50,6 @@ export default function App() {
                 <View>
                   <Text style={styles.repository}> {repository.title} </Text>
                   <View style={styles.techsContainer}>
-                    {/* <Text style={styles.tech}>ReactJS</Text> */}
                     {repository.techs.map((techs) => (
                       <Text style={styles.tech} key={techs}>
                         {techs}
@@ -55,7 +60,7 @@ export default function App() {
                     <Text
                       style={styles.likeText}
                       // Remember to replace "1" below with repository ID: {`repository-likes-${repository.id}`}
-                      testID={`repository-likes-${repositories.id}`}
+                      testID={`repository-likes-${repository.id}`}
                     >
                       {repository.likes} curtidas
                     </Text>
